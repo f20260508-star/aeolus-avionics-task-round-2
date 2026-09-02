@@ -134,3 +134,80 @@ In comparison:
 Build 1 is therefore not the lowest-cost option. However, it provides a strong compute-to-capability trade-off because the Jetson can run more capable
 real-time person-detection, stereo-depth and target-tracking algorithms than a Raspberry Pi-only architecture.Therefore, the higher cost of Build 1 is
 justified by its stronger AI capability and future expandability.
+
+## 11. Architecture Rating and Weightage
+
+For this search-and-rescue mission, compute capability and mission suitability are given the highest weightage. The drone must reliably detect a person, estimate distance using stereo vision and make safe high-level decisions while flying autonomously.
+
+| Criterion | Weightage | Reason |
+|---|---:|---|
+| Compute | 30% | Real-time person detection and stereo-depth processing are required |
+| Use case suitability | 30% | The architecture must support autonomous search, target detection and obstacle awareness |
+| Power consumption | 15% | Avionics power affects battery endurance |
+| Weight | 15% | The complete drone must remain below 2.5 kg |
+| Cost | 10% | Cost matters, but rescue capability and safety are more important |
+| **Total** | **100%** |  |
+
+A rating of 5 indicates the best performance in that criterion, while a rating of 1 indicates the weakest performance.
+
+| Build | Compute /5 | Use Case /5 | Power /5 | Weight /5 | Cost /5 | Weighted Score /5 |
+|---|---:|---:|---:|---:|---:|---:|
+| **1. Stereo camera + Jetson Orin Nano** | **5** | **5** | 3 | 3 | 2 | **4.10** |
+| 2. OAK-D Lite + Raspberry Pi 5 | 4 | 3 | 5 | 4 | 4 | 3.80 |
+| 3. LiDAR + IMX219 camera + Raspberry Pi 5 | 3 | 4 | 3 | 3 | 3 | 3.35 |
+| 4. Stereo camera + Raspberry Pi 5 | 3 | 3 | 4 | 4 | 4 | 3.45 |
+| 5. RealSense D435i + Jetson Orin Nano | 5 | 4 | 3 | 3 | 2 | 3.95 |
+
+### Build 1 Score Calculation
+
+\[
+\text{Weighted score} =
+(5 \times 0.30) +
+(5 \times 0.30) +
+(3 \times 0.15) +
+(3 \times 0.15) +
+(2 \times 0.10)
+\]
+
+\[
+= 1.50 + 1.50 + 0.45 + 0.45 + 0.20
+\]
+
+\[
+= 4.10/5
+\]
+
+## 12. Bonus: Camera Orientation
+
+The IMX219-83 stereo camera should be mounted at the front centre of the drone, facing forward. The two cameras must remain side-by-side with a horizontal baseline because stereo-depth estimation uses the left-right difference between the two images.
+
+### Recommended Orientation
+
+| Parameter | Recommended Value | Reason |
+|---|---|---|
+| Camera position | Front centre of the drone | Provides an unobstructed forward view |
+| Stereo baseline | Horizontal, left camera and right camera side-by-side | Supports standard stereo matching and depth estimation |
+| Yaw alignment | Aligned with the drone forward direction | Makes target direction easier to relate to drone heading |
+| Mounting method | Rigid mount with vibration isolation | Reduces motion blur and preserves stereo calibration |
+
+The camera should be mounted high enough and far enough forward that the propellers, frame arms and landing gear do not block the camera field of view.
+The camera should also be kept away from ESC power wires and motors as much as possible to reduce vibration and electrical interference. The selected
+orientation provides a balance between forward search coverage and near-field obstacle awareness.
+
+## 13. Bonus: Alternate Build
+
+The alternate architecture I recommend is **Build 5: Intel RealSense D435i depth camera + NVIDIA Jetson Orin Nano**.
+
+The Intel RealSense D435i provides depth information directly, which reduces the amount of stereo-camera calibration and image-processing setup required compared with a custom stereo-camera pair, which is used in Build 1.
+
+The Jetson Orin Nano remains useful in this alternate build because it can run advanced person-detection and target-tracking AI models using the RealSense RGB and depth data.
+
+| Advantage of Build 5 | Limitation of Build 5 |
+|---|---|
+| Ready-made depth camera | Higher cost than the IMX219-83 stereo camera |
+| Easier depth-camera integration and calibration | Adds weight to the drone |
+| Jetson provides strong AI compute for person detection | Higher power consumption than Raspberry Pi-based options |
+
+Build 5 is a strong alternate option when the team wants a more ready-to-use depth camera and has a higher budget. However, I selected Build 1 as the
+primary architecture because the IMX219-83 stereo pair is lighter, lower-cost and provides a flexible camera system, while the Jetson Orin Nano still
+supplies strong AI compute for the search-and-rescue mission.
